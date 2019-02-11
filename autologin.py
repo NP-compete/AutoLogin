@@ -48,8 +48,8 @@ def logoff():
 if __name__ == "__main__":
 #    username = input('Enter username:\n')
 #    password = input('Enter password:\n')
-    username = '17mcmc21'
-    password = 'cnf2017'
+    username = ' input username here'
+    password = ' input password here'
     signal.signal(signal.SIGINT, signal_handler)
     result = login()
 
