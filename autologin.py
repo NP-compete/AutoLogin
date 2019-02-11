@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
+import os
+os.system('pip install lxml bs4 requests')
 
 import signal
 import sys
