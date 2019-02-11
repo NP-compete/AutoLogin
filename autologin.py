@@ -1,34 +1,56 @@
-import  os
-os.system("pip install -U autologin &> /dev/null")
+#!/usr/bin/env python
+# coding=utf-8
 
-import subprocess
-import socket
+import signal
+import sys
+import time
 
-def internet_connected(host="8.8.8.8", port=53):
-	"""
-	Checking internet connectivity
-	Host: 8.8.8.8 (google-public-dns-a.google.com)
-	OpenPort: 53/tcp
-	Service: domain (DNS/TCP)
-	"""
-	try:
-		socket.setdefaulttimeout(1)
-		socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((host, port))
-		return True
-	except Exception as ex:
-		pass
-	return False
+import requests
+from bs4 import BeautifulSoup
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
-def autologin(url,username,password):
-	"""
-	Autologin to captive portal
-	"""
-	
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-def main():
-	status = internet_connected()
-	if status:
-		autologin('https://192.168.56.2:8090/httpclient.html', '17mcmc21', 'cnf2017')
+url = 'https://192.168.56.2:8090/httpclient.html'
 
-if  __name__ =='__main__':
-    main()
+def signal_handler(signal, frame):
+    logoff()
+    sys.exit(0)
+
+
+def login():
+    payload = {
+        'mode': '191',
+        'username': username,
+        'password': password
+    }
+    with requests.Session() as s:
+        p = s.post(url, data=payload, verify=False)
+        soup = BeautifulSoup(p.text, "xml")
+        for i in soup.find_all('message'):
+            response = i.text
+            print(username + ": " + response)
+    return response
+
+
+def logoff():
+    payload = {'mode': 193, 'username': username}
+    with requests.Session() as n:
+        j = n.post(url, data=payload, verify=False)
+        soup = BeautifulSoup(j.text, "xml")
+        for i in soup.find_all('message'):
+            response = i.text
+            print(username + ": " + response)
+
+
+if __name__ == "__main__":
+#    username = input('Enter username:\n')
+#    password = input('Enter password:\n')
+    username = '17mcmc21'
+    password = 'cnf2017'
+    signal.signal(signal.SIGINT, signal_handler)
+    result = login()
+
+    while result == 'You have successfully logged in':
+        time.sleep(7100)
+        result = login()
